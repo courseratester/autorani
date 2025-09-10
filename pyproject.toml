@@ -1,5 +1,5 @@
 [project]
-name = "aqa"
+name = "autorani"
 version = "0.1.0"
 description = "Lightweight site explorer + test generator"
 readme = "README.md"

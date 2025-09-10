@@ -8,9 +8,11 @@ generate:
   file_prefix: test_generated_
   include_prints: true
   include_comments: true
+  link_assertions_max: 10 # max links per page to assert
+  link_match_strategy: "contains" # "contains" | "exact"
 last_crawl:
-  domain: www.python.org
-  count: 200
+  domain: www.delta.com
+  count: 1
 selenium:
   browser: chrome
   headless: false

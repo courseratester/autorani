@@ -10,7 +10,7 @@ def cmd_explore(args):
     store = YAMLStore()
     max_pages = store.get("crawl.max_pages", None)
     timeout = store.get("crawl.timeout_sec", 10)
-    ua = store.get("crawl.user_agent", "AQaTestBot/0.1")
+    ua = store.get("crawl.user_agent", "AutoRaniTestBot/0.1")
     same_domain = store.get("crawl.same_domain_only", True)
 
     crawler = Crawler(
@@ -37,21 +37,26 @@ def cmd_generate(args, store: YAMLStore | None):
     if not st.crawl_results:
         st.load_crawl()
         if not st.crawl_results:
-            print("[GENERATE] No in-memory crawl; proceeding with empty set. (Did you run 'explore'?)")
+            print("[GENERATE] No saved crawl found; generating a single seed test.")
 
     output_dir = st.get("generate.output_dir", "tests/generated")
     file_prefix = st.get("generate.file_prefix", "test_generated_")
     include_prints = st.get("generate.include_prints", True)
     include_comments = st.get("generate.include_comments", True)
+    link_assertions_max = int(st.get("generate.link_assertions_max", 10))
+    link_match_strategy = (st.get("generate.link_match_strategy", "contains") or "contains").lower()
 
     domain = domain_of(args.url)
-    target_pages = st.crawl_results or {args.url: {"status": 200, "title": "", "h1": ""}}
+    target_pages = st.crawl_results or {args.url: {"status": 200, "title": "", "h1": "", "out_links": []}}
 
     fpath = generate_pytest_file(
         target_pages, output_dir, file_prefix,
-        include_prints, include_comments, domain
+        include_prints, include_comments, domain,
+        link_assertions_max=link_assertions_max,
+        link_match_strategy=link_match_strategy,
     )
     print(f"[GENERATE] Wrote tests to: {fpath}")
+
 
 def cmd_run(args):
     # Run pytest on generated tests
@@ -60,7 +65,7 @@ def cmd_run(args):
     sys.exit(proc.returncode)
 
 def build_parser():
-    p = argparse.ArgumentParser(prog="aqa.main", description="AQa: Explore site and generate pytest tests.")
+    p = argparse.ArgumentParser(prog="autorani.main", description="AQa: Explore site and generate pytest tests.")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     pe = sub.add_parser("explore", help="Crawl a site.")

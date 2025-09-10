@@ -10,8 +10,7 @@ class Crawler:
         self.timeout = timeout_sec
         self.same_domain_only = same_domain_only
         self.headers = {"User-Agent": user_agent}
-        # absolute hard safety cap to avoid by-accident huge crawls
-        self.hard_cap = 200
+        self.hard_cap = 200  # absolute safety cap
 
     def crawl(self) -> Dict[str, Dict]:
         seen: Set[str] = set()
@@ -36,27 +35,42 @@ class Crawler:
             try:
                 resp = requests.get(url, headers=self.headers, timeout=self.timeout)
                 status = resp.status_code
-                html = resp.text if "text/html" in resp.headers.get("Content-Type", "") else ""
+                content_type = resp.headers.get("Content-Type", "")
+                html = resp.text if "text/html" in content_type else ""
                 soup = BeautifulSoup(html, "html.parser") if html else None
+
                 title = (soup.title.string.strip() if soup and soup.title else "")
                 h1 = (soup.find("h1").get_text(strip=True) if soup and soup.find("h1") else "")
 
                 links = []
+                form_count = 0
+                button_count = 0
+                nav_count = 0
+
                 if soup:
+                    # Links
                     for a in soup.find_all("a", href=True):
                         abs_url = normalize_link(url, a["href"])
                         links.append(abs_url)
                         if should_visit(abs_url):
                             queue.append(abs_url)
+                    # Key elements (for later assertions if seen)
+                    form_count = len(soup.find_all("form"))
+                    button_count = len(soup.find_all("button"))
+                    # <nav> landmarks
+                    nav_count = len(soup.find_all("nav"))
 
                 results[url] = {
                     "status": status,
                     "title": title,
                     "h1": h1,
-                    "out_links": links[:50],  # keep it lightweight
+                    "out_links": links[:50],       # keep it lightweight
+                    "form_count": form_count,      # for assertions
+                    "button_count": button_count,  # for assertions
+                    "nav_count": nav_count,        # for assertions
                 }
                 seen.add(url)
             except requests.RequestException as e:
-                results[url] = {"status": None, "error": str(e), "out_links": []}
+                results[url] = {"status": None, "error": str(e), "out_links": [], "form_count": 0, "button_count": 0, "nav_count": 0}
                 seen.add(url)
         return results
