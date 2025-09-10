@@ -8,8 +8,8 @@ generate:
   file_prefix: test_generated_
   include_prints: true
   include_comments: true
-  link_assertions_max: 10 # max links per page to assert
-  link_match_strategy: "contains" # "contains" | "exact"
+  link_assertions_max: 10
+  link_match_strategy: contains
 last_crawl:
   domain: www.delta.com
   count: 1
@@ -19,3 +19,4 @@ selenium:
   window_size: 1366,900
   page_load_timeout_sec: 20
   implicit_wait_sec: 2
+last_generated_file: tests/generated\test_generated_www_delta_com.py

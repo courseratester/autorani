@@ -5,6 +5,7 @@ from .state_store import YAMLStore
 from .crawler import Crawler
 from .utils import domain_of
 from .testgen import generate_pytest_file
+import os
 
 def cmd_explore(args):
     store = YAMLStore()
@@ -56,12 +57,19 @@ def cmd_generate(args, store: YAMLStore | None):
         link_match_strategy=link_match_strategy,
     )
     print(f"[GENERATE] Wrote tests to: {fpath}")
+    st.set("last_generated_file", fpath)   # save it
+    st.save()
 
 
 def cmd_run(args):
-    # Run pytest on generated tests
-    print("[RUN] Executing pytest on tests/generated ...")
-    proc = subprocess.run([sys.executable, "-m", "pytest", "-q", "tests/generated"], check=False)
+    store = YAMLStore()
+    last_file = store.get("last_generated_file")
+    if last_file and os.path.exists(last_file):
+        print(f"[RUN] Executing pytest on {last_file} ...")
+        proc = subprocess.run([sys.executable, "-m", "pytest", "-q", last_file], check=False)
+    else:
+        print("[RUN] No last_generated_file found. Running all tests in tests/generated/")
+        proc = subprocess.run([sys.executable, "-m", "pytest", "-q", "tests/generated"], check=False)
     sys.exit(proc.returncode)
 
 def build_parser():

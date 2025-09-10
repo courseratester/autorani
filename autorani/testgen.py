@@ -102,8 +102,8 @@ def generate_pytest_file(
                 f"    print('[TEST] Title seen during crawl:', {info.get('title','')!r})\n"
                 f"    print('[TEST] H1 seen during crawl:', {info.get('h1','')!r})\n"
                 f"    print('[TEST] Links sampled:', {min(len(info.get('out_links', [])), link_assertions_max)})\n"
-                f"    print('[TEST] Observed counts: forms=', {info.get('form_count',0)}, "
-                f"buttons=", {info.get('button_count',0)}, " nav=", {info.get('nav_count',0)})\n"
+                f"    print('[TEST] Observed counts: forms={info.get('form_count', 0)} "
+                f"buttons={info.get('button_count', 0)} nav={info.get('nav_count', 0)}')\n"
             )
 
         expected_title = (info.get("title") or "").strip()
