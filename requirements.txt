@@ -1,0 +1,6 @@
+selenium
+webdriver-manager
+pytest
+requests
+beautifulsoup4
+PyYAML

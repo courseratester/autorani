@@ -1,0 +1,19 @@
+crawl:
+  max_pages: null
+  timeout_sec: 10
+  user_agent: AQaTestBot/0.1
+  same_domain_only: true
+generate:
+  output_dir: tests/generated
+  file_prefix: test_generated_
+  include_prints: true
+  include_comments: true
+last_crawl:
+  domain: www.python.org
+  count: 200
+selenium:
+  browser: chrome
+  headless: false
+  window_size: 1366,900
+  page_load_timeout_sec: 20
+  implicit_wait_sec: 2
